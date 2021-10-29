@@ -159,6 +159,10 @@
             this.currProgress = 0;
             this.currProgressPerc = 0;
             this.color = color;
+            this.playerIcon = new Image();
+            this.playerIcon.src = "./images/progressBar/pig_bar.png";
+            this.endIcon = new Image();
+            this.endIcon.src = "./images/progressBar/end_bar.png";
         }
         setValue(value) {
             if (value > this.maxProgress) {
@@ -198,6 +202,20 @@
             let drawY = this.pY - this.dH / 2;
             ctx.fillRect(drawX, drawY, this.currProgressPerc * this.dW, this.dH);
             ctx.strokeRect(drawX, drawY, this.dW, this.dH);
+            ctx.drawImage(
+                this.endIcon, // Image
+                0, 0, // Source X/Y
+                168, 138, // Source Width/Height
+                drawX + this.dW - 17, drawY - (this.dH)/2, // Destination X/Y
+                34, 27 // Destination Width/Height
+            );
+            ctx.drawImage(
+                this.playerIcon, // Image
+                0, 0, // Source X/Y
+                197, 140, // Source Width/Height
+                drawX + this.currProgressPerc*this.dW - 20, drawY - 28/2 + this.dH/2, // Destination X/Y
+                39, 28 // Destination Width/Height
+            );
         }
     }
 
@@ -418,7 +436,8 @@
             this.player = null; //new Player();
             //this.player.frameY = 0;
             //PROGRESS BAR
-            this.progressBar = new ProgressBar(canvas_WIDTH/2, 30, canvas_WIDTH/2, 20, 0, duration, 'green');
+            this.progressBar = new ProgressBar(canvas_WIDTH/3 * 2, 30, canvas_WIDTH/3 * 2 * 0.8, 16, 0, duration, 'green');
+            //this.lifeBar = new LifeBar(canvas_WIDTH/6, 30, canvas_WIDTH/3 * 0.8, 20)
             this.duration = duration;
             //OBSTÁCULOS
             this.obstacles = [];
