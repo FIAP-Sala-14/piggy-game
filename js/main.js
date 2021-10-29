@@ -13,11 +13,9 @@ window.onload = function () {
 
   const vid = document.getElementById("v_intro");
   const vidEnding = document.getElementById("v_ending");
-  //vid.addEventListener('ended',myHandler,false);
-  function myHandler(e) {
-    vidEnding.hidden = true;
+  vid.onended = function () {
     include("./js/start_game.js");
     vid.hidden = true;
-  }
-  myHandler(1);
+  };
+  vidEnding.hidden = true;
 };
