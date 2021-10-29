@@ -1,16 +1,17 @@
-#canvas1{
-    width: 480px;
-    height: 320px;
-    border: 1px solid black;
-    position:absolute;
-    top:50%;
-    left: 50%;
-    transform: translate(-50%,-50%);
+#canvas1 {
+  width: 480px;
+  height: 320px;
+  border: 1px solid black;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
-#v_intro {
-    transform: translate(-50%, -50%);
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    background-color:aqua;
-  }
+#v_intro,
+#v_ending {
+  transform: translate(-50%, -50%);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background-color: white;
+}
