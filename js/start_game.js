@@ -222,6 +222,61 @@
 
 
     //##################################################################################################################
+    //###   LIFE BAR
+    //##################################################################################################################
+
+
+
+    class LifeBar {
+        constructor(pX, pY, dW, dH) {
+            this.pX = pX;
+            this.pY = pY;
+            this.dW = dW;
+            this.dH = dH;
+            this.icoW = dW/3;
+            this.livesLeft = 3;
+            this.lifeIcon = new Image();
+            this.lifeIcon.src = "./images/lifeBar/heart.png";
+            this.lifeEmptyIcon = new Image();
+            this.lifeEmptyIcon.src = "./images/lifeBar/heart_empty.png";
+        }
+        setLives(value) {
+            value = parseInt(value);
+            if (value > 3) this.livesLeft = 3;
+            else if (value < 0) this.livesLeft = 0;
+            else this.livesLeft = value;
+        }
+        addLives(value) {
+            value = parseInt(this.livesLeft + value);
+            this.setLives(value);
+        }
+        draw() {
+            let measures = {
+                drawX: this.pX - this.dW / 2,
+                drawY: this.pY - this.dH / 2
+            };
+            function printIcon(iconIndex, lifeBar, measures) {
+                let icon;
+                if (lifeBar.livesLeft >= iconIndex) icon = lifeBar.lifeIcon;
+                else icon = lifeBar.lifeEmptyIcon;
+
+                ctx.drawImage(
+                    icon, // Image
+                    0, 0, // Source X/Y
+                    168, 144, // Source Width/Height
+                    measures.drawX + lifeBar.icoW*(iconIndex-1), measures.drawY, // Destination X/Y
+                    lifeBar.icoW, lifeBar.dH // Destination Width/Height
+                );
+            }
+            printIcon(1, this, measures);
+            printIcon(2, this, measures);
+            printIcon(3, this, measures);
+        }
+    }
+
+
+
+    //##################################################################################################################
     //###   UI
     //##################################################################################################################
 
@@ -437,7 +492,7 @@
             //this.player.frameY = 0;
             //PROGRESS BAR
             this.progressBar = new ProgressBar(canvas_WIDTH/3 * 2, 30, canvas_WIDTH/3 * 2 * 0.8, 16, 0, duration, 'green');
-            //this.lifeBar = new LifeBar(canvas_WIDTH/6, 30, canvas_WIDTH/3 * 0.8, 20)
+            this.lifeBar = new LifeBar(canvas_WIDTH/6, 30, canvas_WIDTH/3 * 0.8, 35)
             this.duration = duration;
             //OBSTÁCULOS
             this.obstacles = [];
@@ -465,7 +520,7 @@
             }
             let tick = this.tick;
             let obstacles = this.obstacles;
-            this.waitingObstacles.forEach(function(item, index, object){
+            this.waitingObstacles.forEach(function(item, index, object, tick, obstacles){
                 if (item <= tick) {
                     obstacles.push(new Obstaculo());
                     object.splice(index, 1);
@@ -491,6 +546,9 @@
         update_progressBar(meta=true, draw=true) {
             if (meta) this.progressBar.setValue(now() - this.startTime);
             if (draw) this.progressBar.draw();
+        }
+        update_lifeBar(meta=true, draw=true) {
+            if (draw) this.lifeBar.draw();
         }
         reset() {
             this.speed = this.start_speed;
@@ -645,11 +703,12 @@
                     this.level.update_scene();
                     //OBSTACULOS
                     this.level.update_obstacles();
-                    //if (this.level.tick % 100 == 0) console.log(this.level.tick, this.level.waitingObstacles, this.level.obstacles);
+                    if (this.level.tick % 100 == 0) console.log(this.level.tick, this.level.waitingObstacles, this.level.obstacles);
                     //PLAYER
                     this.level.update_player();
-                    //PROGRESS BAR
+                    //PROGRESS/LIFE BAR
                     this.level.update_progressBar();
+                    this.level.update_lifeBar();
                     //DIFICULDADE
                     this.level.dificuldade();
     
