@@ -1,4 +1,3 @@
-
 //function gameplay() {
 
 
@@ -143,7 +142,7 @@
 
 
     //##################################################################################################################
-    //###   PROGRESS BAR
+    //###   PROGRESS & LIFE BAR
     //##################################################################################################################
 
 
@@ -218,14 +217,6 @@
             );
         }
     }
-
-
-
-    //##################################################################################################################
-    //###   LIFE BAR
-    //##################################################################################################################
-
-
 
     class LifeBar {
         constructor(pX, pY, dW, dH) {
@@ -518,22 +509,24 @@
             if (this.obstacles.length + this.waitingObstacles.length < 4) {
                 this.waitingObstacles.push(this.tick + Math.floor(Math.random() * 2000) + 300);
             }
-            let tick = this.tick;
-            let obstacles = this.obstacles;
-            this.waitingObstacles.forEach(function(item, index, object, tick, obstacles){
-                if (item <= tick) {
-                    obstacles.push(new Obstaculo());
-                    object.splice(index, 1);
+            //var level=this;
+
+            //console.log(this.waitingObstacles.length);
+            for (let i = this.waitingObstacles.length-1; i >= 0; i--) {
+                if (this.waitingObstacles[i] <= this.tick) {
+                    this.obstacles.push(new Obstaculo());
+                    this.waitingObstacles.splice(i, 1);
                 }
-            });
-            this.obstacles.forEach(function(item, index, object){
-                if (item.state == 'out_of_scene') {
-                    object.splice(index, 1);
+            }
+            for (let i = this.waitingObstacles.length-1; i >= 0; i--) {
+                if (this.waitingObstacles[i].state == 'out_of_scene') {
+                    this.waitingObstacles.splice(i, 1);
                 } else {
-                    if (meta) item.update();
-                    if (draw) item.draw();
+                    console.log(this.waitingObstacles[i]);
+                    if (meta) this.waitingObstacles[i].update();
+                    if (draw) this.waitingObstacles[i].draw();
                 }
-            });
+            };
         }
         //PLAYER
         update_player(meta=true, draw=true) {
@@ -569,6 +562,12 @@
     
         lv2: new Level(
             name = 'Fase 2', res_path = "./images/levels/lv1", type = 'endless-running-side-2d',
+            speedModifier = 0.00005, start_speed = 1, gravityAceleration = 0.3, duration = 40000,
+            backgrounds = ["bg1.png", "bg2.png", "bg3.png", "bg4.png", "bg5.png", "bg6.png"]
+        ),
+    
+        lv3: new Level(
+            name = 'Fase 3', res_path = "./images/levels/lv1", type = 'endless-running-side-2d',
             speedModifier = 0.00005, start_speed = 1, gravityAceleration = 0.3, duration = 40000,
             backgrounds = ["bg1.png", "bg2.png", "bg3.png", "bg4.png", "bg5.png", "bg6.png"]
         )
@@ -610,7 +609,7 @@
             };
         }
         update(speed){
-            this.pX += speed; //multiplicado pelo speedModifier do chao
+            this.pX += game.level.speed; //multiplicado pelo speedModifier do chao
             if (this.pX <= -this.anim[this.state].dest_width*2) {
                 this.state = 'out_of_scene';
             }
@@ -719,6 +718,15 @@
                         this.state = 'level_end';
                         this.level.player.state = 'idle';
                     };
+
+                    if (this.level.name == this.levels[0].name) {
+                        this.game.state = 'game_finish';
+                        //this.level = this.levels[1];
+                    } else if (this.level.name == this.levels[1].name) {
+                        this.levels[2];
+                    } else if (this.level.name == this.levels[2].name) {
+                        this.game.state = 'game_finish';
+                    }
                     
                     break;
                 case 'level_end':
@@ -737,6 +745,8 @@
                     this.level.tick++;
                     this.tick++;
                     
+                    break;
+                case 'game_finish':
                     break;
                 case 'game_over':
                     //CENARIO
