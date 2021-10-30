@@ -565,18 +565,18 @@
             }
             
             for (var i = this.waitingObstacles.length-1; i >= 0; i--) {
-              if (this.waitingObstacles[i] <= this.tick) {
-                  this.obstacles.push(new Obstaculo());
-                  this.waitingObstacles.splice(i, 1);
-              }
+                if (this.waitingObstacles[i] <= this.tick) {
+                    this.obstacles.push(new Obstaculo());
+                    this.waitingObstacles.splice(i, 1);
+                }
             }
             for (var i = this.obstacles.length-1; i >= 0; i--) {
-              if (this.obstacles[i].state == 'out_of_scene') {
-                  this.obstacles.splice(i, 1);
-              } else {
-                  if (meta) this.obstacles[i].update();
-                  if (draw) this.obstacles[i].draw();
-              }
+                if (this.obstacles[i].state == 'out_of_scene') {
+                    this.obstacles.splice(i, 1);
+                } else {
+                    if (meta) this.obstacles[i].update();
+                    if (draw) this.obstacles[i].draw();
+                }
             };
         }
         //COINS
@@ -625,6 +625,7 @@
             this.player.frameY = 0;
             this.obstacles = [];
             this.waitingObstacles = [];
+            this.lifeBar.setLives(3);
         }
     }
     
