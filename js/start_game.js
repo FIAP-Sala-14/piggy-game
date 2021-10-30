@@ -12,8 +12,8 @@
     const ctx = canvas.getContext('2d');
     const log = document.getElementById('log');
 
-    const canvas_WIDTH = canvas.width = 480;
-    const canvas_HEIGHT = canvas.height = 320;
+    const canvas_WIDTH = canvas.width;
+    const canvas_HEIGHT = canvas.height;
 
     const now = function() {return new Date().getTime()};
 
@@ -265,6 +265,48 @@
         }
     }
 
+    class CoinsBar {
+        constructor(pX, pY, dW, dH) {
+            this.pX = pX;
+            this.pY = pY;
+            this.dW = dW;
+            this.dH = dH;
+            this.bg = new Image();
+            this.bg.src = "./images/coinBar/coin_background.png";
+        }
+        setCoins(value) {
+            value = parseInt(value);
+            if (value < 0) game.level.player.score = 0;
+            else game.level.player.score = value;
+        }
+        addCoins(value) {
+            value = parseInt(game.level.player.score + value);
+            this.setCoins(value);
+        }
+        draw() {
+            let drawX = this.pX - this.dW / 2;
+            let drawY = this.pY - this.dH / 2;
+            ctx.drawImage(
+                this.bg, // Image
+                0, 0, // Source X/Y
+                576, 206, // Source Width/Height
+                drawX, drawY, // Destination X/Y
+                this.dW, this.dH // Destination Width/Height
+            );
+
+            ctx.font = "30px Verdana";
+            // Create gradient
+            let gradient = ctx.createLinearGradient(0, 0, 576, 0);
+            gradient.addColorStop("0"," magenta");
+            gradient.addColorStop("0.5", "blue");
+            gradient.addColorStop("1.0", "red");
+            // Fill with gradient
+            ctx.fillStyle = gradient;
+            ctx.fillText(game.level.player.score, this.pX -this.dW/10 , this.pY + this.dH/2 - 0.7*15);
+        }
+        
+    }
+
 
 
     //##################################################################################################################
@@ -458,7 +500,7 @@
     
     
     class Level {
-        constructor(name, res_path, type, speedModifier, start_speed, gravityAceleration, duration, backgrounds) {
+        constructor(name, res_path, type, speedModifier, start_speed, gravityAceleration, duration, backgrounds, initialBG, obstacleSpawnSpeed, coinSpawnSpeed) {
             this.name = name; // 'Campo do caçador'; // Exibido para o jogador
             this.res_path = res_path; // 'lv1'; // Utilizado ao puxar texturas e outros recursos
             this.type = type; // 'endless-running-side-2d'; // Utilizado para definir todos os próximos parametros
@@ -478,16 +520,24 @@
                 layers.push(new Layer(res_path + "/" + bg, vX_layerModifier, start_speed));
             });
             this.layers = layers;
+            this.initialLayer = new Image();
+            this.initialLayer.src = res_path + "/" + initialBG;
             //PLAYER
             this.player = null; //new Player();
             //this.player.frameY = 0;
             //PROGRESS BAR
             this.progressBar = new ProgressBar(canvas_WIDTH/3 * 2, 30, canvas_WIDTH/3 * 2 * 0.8, 16, 0, duration, 'green');
             this.lifeBar = new LifeBar(canvas_WIDTH/6, 30, canvas_WIDTH/3 * 0.8, 35)
+            this.coinsBar = new CoinsBar(canvas_WIDTH/6, 80, canvas_WIDTH/3 * 0.8, 40);
             this.duration = duration;
             //OBSTÁCULOS
             this.obstacles = [];
             this.waitingObstacles = [];
+            this.obstacleSpawnSpeed = obstacleSpawnSpeed;
+            //OBSTÁCULOS
+            this.coins = [];
+            this.waitingCoins = [];
+            this.coinSpawnSpeed = coinSpawnSpeed;
     
             this.reset();
         }
@@ -501,13 +551,17 @@
                     this.speed += this.speed * this.speedModifier;
                     object.update(this.speed);
                 }
-                if (draw) object.draw();
+                if (draw) {
+                    object.draw();
+                    this.initialLayer
+                    if (game.state == '' & game.level.name != 'Fase 1') ctx.drawImage(this.initialLayer, 0, 0, 480, 320);
+                }
             }); 
         }
         //OBSTACLES
         update_obstacles(meta=true, draw=true){
             if (this.obstacles.length + this.waitingObstacles.length < 4) {
-                this.waitingObstacles.push(this.tick + Math.floor(Math.random() * 2000) + 300);
+                this.waitingObstacles.push(this.tick + Math.floor(Math.random() * 2000) + 1/this.obstacleSpawnSpeed*350);
             }
             
             for (var i = this.waitingObstacles.length-1; i >= 0; i--) {
@@ -522,6 +576,27 @@
               } else {
                   if (meta) this.obstacles[i].update();
                   if (draw) this.obstacles[i].draw();
+              }
+            };
+        }
+        //COINS
+        update_coins(meta=true, draw=true){
+            if (this.coins.length + this.waitingCoins.length < 4) {
+                this.waitingCoins.push(this.tick + Math.floor(Math.random() * 2000) + 1/this.coinSpawnSpeed*350);
+            }
+            
+            for (var i = this.waitingCoins.length-1; i >= 0; i--) {
+              if (this.waitingCoins[i] <= this.tick) {
+                  this.coins.push(new Coin());
+                  this.waitingCoins.splice(i, 1);
+              }
+            }
+            for (var i = this.coins.length-1; i >= 0; i--) {
+              if (this.coins[i].state == 'out_of_scene') {
+                  this.coins.splice(i, 1);
+              } else {
+                  if (meta) this.coins[i].update();
+                  if (draw) this.coins[i].draw();
               }
             };
         }
@@ -540,6 +615,9 @@
         update_lifeBar(meta=true, draw=true) {
             if (draw) this.lifeBar.draw();
         }
+        update_coinsBar(meta=true, draw=true) {
+            if (draw) this.coinsBar.draw();
+        }
         reset() {
             this.speed = this.start_speed;
             this.startTime = null;
@@ -553,20 +631,23 @@
     var levels = {
         lv1: new Level(
             name = 'Fase 1', res_path = "./images/levels/lv1", type = 'endless-running-side-2d',
-            speedModifier = 0.00005, start_speed = 1, gravityAceleration = 0.3, duration = 40000,
-            backgrounds = ["bg1.png", "bg2.png", "bg3.png", "bg4.png", "bg5.png", "bg6.png"]
+            speedModifier = 0.00005, start_speed = 1, gravityAceleration = 0.3, duration = 80000,
+            backgrounds = ["bg1.png", "bg2.png", "bg3.png", "bg4.png", "bg5.png", "bg6.png"], initialBG = 'inicial.png',
+            obstacleSpawnSpeed = 2, coinSpawnSpeed = 2
         ),
     
         lv2: new Level(
-            name = 'Fase 2', res_path = "./images/levels/lv1", type = 'endless-running-side-2d',
-            speedModifier = 0.00005, start_speed = 1, gravityAceleration = 0.3, duration = 40000,
-            backgrounds = ["bg1.png", "bg2.png", "bg3.png", "bg4.png", "bg5.png", "bg6.png"]
+            name = 'Fase 2', res_path = "./images/levels/lv2", type = 'endless-running-side-2d',
+            speedModifier = 0.00005, start_speed = 1, gravityAceleration = 0.3, duration = 80000,
+            backgrounds = ["bg1.png", "bg2.png", "bg3.png", "bg4.png", "bg5.png", "bg6.png"], initialBG = 'inicial.png',
+            obstacleSpawnSpeed = 1.5, coinSpawnSpeed = 1.5
         ),
     
         lv3: new Level(
             name = 'Fase 3', res_path = "./images/levels/lv1", type = 'endless-running-side-2d',
-            speedModifier = 0.00005, start_speed = 1, gravityAceleration = 0.3, duration = 40000,
-            backgrounds = ["bg1.png", "bg2.png", "bg3.png", "bg4.png", "bg5.png", "bg6.png"]
+            speedModifier = 0.00005, start_speed = 1, gravityAceleration = 0.3, duration = 80000,
+            backgrounds = ["bg1.png", "bg2.png", "bg3.png", "bg4.png", "bg5.png", "bg6.png"], initialBG = 'inicial.png',
+            obstacleSpawnSpeed = 2, coinSpawnSpeed = 3
         )
     }
     
@@ -616,10 +697,13 @@
             const dy = this.pY - game.level.player.pY;
             const distance = Math.sqrt(dx*dx + dy*dy);
             if (distance < this.radius + game.level.player.radius & this.state == 'idle') {
-                game.state = 'game_over';
+                game.level.lifeBar.addLives(-1);
+                if (game.level.lifeBar.livesLeft == 0) {
+                    game.state = 'game_over';
+                    game.level.player.state = 'dying';
+                }
                 this.state = 'closing';
                 this.anim[this.state].toFirstFrame();
-                game.level.player.state = 'dying';
                 game.level.player.anim[game.level.player.state].toFirstFrame();
             }
     
@@ -629,6 +713,44 @@
             this.anim[this.state].dest_x = this.pX;
             this.anim[this.state].dest_y = this.pY;
             this.anim[this.state].draw();
+        }
+    }
+    
+
+    
+    class Coin {
+        constructor(){
+            this.pX = canvas_WIDTH;
+            this.pY = 270;
+            this.radius = 30;
+            this.state = "idle"; // "out_of_scene"
+            this.icon = new Animation(
+                imageSrc="./images/Colecionaveis/coin.png", src_width=155, src_height=155,
+                row=0, startFrame=0, qtdFrames=1, repeat=true,
+                dest_x=canvas_WIDTH, dest_y=canvas_HEIGHT/2, dest_width=30, dest_height=30
+            );
+        }
+        update(){
+            this.pX += game.level.layers[game.level.layers.length-1].vX; //multiplicado pelo speedModifier do chao
+            if (this.pX <= -this.icon.dest_x*2) {
+                this.state = 'out_of_scene';
+            }
+            
+            //colisao
+            const dx = this.pX - game.level.player.pX;
+            const dy = this.pY - game.level.player.pY;
+            const distance = Math.sqrt(dx*dx + dy*dy);
+            if (distance < this.radius + game.level.player.radius & this.state == 'idle') {
+                game.level.coinsBar.addCoins(10);
+                delete this;
+            }
+    
+            this.icon.nextTimedFrame();
+        }
+        draw(){
+            this.icon.dest_x = this.pX;
+            this.icon.dest_y = this.pY;
+            this.icon.draw();
         }
     }
 
@@ -643,7 +765,7 @@
     
     class Game {
         constructor() {
-            this.state = 'main_menu';
+            this.state = 'level_init';
             this.levels = levels;
             this.level = levels.lv1;
             this.tick = 0;
@@ -669,7 +791,7 @@
                     this.level.player.state = 'running';
                     this.level.update_player();
                     //ESTADO DO GAME
-                    this.state = 'main_menu';
+                    this.state = 'level_init';
     
                     this.level.tick++;
                     this.tick++;
@@ -693,18 +815,39 @@
                     this.tick++;
     
                     break;
+                case 'level_init':
+                    //CENARIO
+                    this.level.update_scene();
+                    //MENU
+                    updateMainMenu();
+                    //PLAYER
+                    this.level.player.state = 'running';
+                    this.level.update_player();
+                    if (mousePressed) {
+                        this.state = 'level_running';
+                        this.level.player.state = 'running';
+                        this.level.startTime = now();
+                    }
+    
+                    this.level.tick++;
+                    this.tick++;
+    
+                    break;
                 case 'level_running':
                     //if (this.level.startTime == null) this.level.startTime = now();
                     //CENARIO
                     this.level.update_scene();
                     //OBSTACULOS
                     this.level.update_obstacles();
+                    //this.level.update_coins();
                     if (this.level.tick % 100 == 0) console.log(this.level.tick, this.level.waitingObstacles, this.level.obstacles);
+                    //if (this.level.tick % 100 == 0) console.log(this.level.tick, this.level.waitingCoins, this.level.coins);
                     //PLAYER
                     this.level.update_player();
                     //PROGRESS/LIFE BAR
                     this.level.update_progressBar();
                     this.level.update_lifeBar();
+                    //this.level.update_coinsBar();
                     //DIFICULDADE
                     this.level.dificuldade();
     
@@ -713,10 +856,12 @@
                     
                     if (this.level.progressBar.currProgressPerc == 1) {
                         if (this.level.name == this.levels.lv1.name) {
-                            this.state = 'game_finish';
                             //this.level = this.levels.lv2;
+                            //this.state = 'level_init';
+                            this.state = 'game_finish';
                         } else if (this.level.name == this.levels.lv2.name) {
-                            this.levels.lv3;
+                            //this.level = this.levels.lv3;
+                            //this.state = 'level_init';
                         } else if (this.level.name == this.levels.lv3.name) {
                             this.state = 'game_finish';
                         }
@@ -730,6 +875,7 @@
                     this.level.update_scene();
                     //OBSTACULOS
                     this.level.update_obstacles();
+                    this.level.update_coins();
                     //PLAYER
                     this.level.update_player();
                     //PROGRESS BAR
@@ -740,10 +886,20 @@
                     this.level.tick++;
                     this.tick++;
 
+                    ctx.fillText('Parabéns!', canvas.width/2-40, canvas.height/2);
+                    ctx.fillText(game.level.name + ' sobreviveu e coletou ' + game.level.score + 'pontos!', canvas.width/2-40, canvas.height/2);
+                    ctx.fillText('sua pontuação é de '+ this.level.player.score, canvas.width/2-60, canvas.height/2+20);
+
                     videoEnding();
                     
                     break;
                 case 'game_finish':
+                    function videoEnding() {
+                      const vidEnding = document.getElementById("v_ending");
+                      vidEnding.hidden = false;
+                    };
+                    videoEnding();
+
                     break;
                 case 'game_over':
                     //CENARIO
@@ -801,10 +957,6 @@
     function gameloop() {
         game.next_tick();
         requestAnimationFrame(gameloop);
-        function videoEnding() {
-          const vidEnding = document.getElementById("v_ending");
-          vidEnding.hidden = false;
-        }
     }
     gameloop();
 //}
