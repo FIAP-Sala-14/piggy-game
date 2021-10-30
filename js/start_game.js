@@ -606,7 +606,7 @@
             };
         }
         update(){
-            this.pX += game.level.speed; //multiplicado pelo speedModifier do chao
+            this.pX += game.level.layers[game.level.layers.length-1].vX; //multiplicado pelo speedModifier do chao
             if (this.pX <= -this.anim[this.state].dest_width*2) {
                 this.state = 'out_of_scene';
             }
@@ -721,8 +721,6 @@
                             this.state = 'game_finish';
                         }
                     };
-
-                    console.log(this.levels);
 
                     
                     break;
