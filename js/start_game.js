@@ -290,64 +290,64 @@
     
     class Player {
         constructor() {
-            // Posi��o
-            this.pX = 75;
-            this.pY_default = 255;
-            this.pY_max = 255; // Limite inferior
-            this.pY = this.pY_default;
-            // Vetores
-            this.vY = 0;
-            this.aY = 0;
-            this.jumpAceleration = -8;
-            this.state = 'idle'; // 'walking', 'running', 'jumping_up', 'jumping_down', 'flying', 'dying'
-            this.radius = 31;
-            // Anima��o
-            this.anim = {
-                "idle": new Animation(
-                    imageSrc = "./images/Sprites/Idle_24.png", src_width = 343, src_height = 248,
-                    row = 0, startFrame = 0, qtdFrames = 24, repeat = true,
-                    dest_x = 75, dest_y = 255, dest_width = 343 / 4, dest_height = 248 / 4,
-                    ticksForAFrame = 3
-                ),
-                "walking": new Animation(
-                    imageSrc = "./images/Sprites/walk_24.png", src_width = 345, src_height = 259,
-                    row = 0, startFrame = 0, qtdFrames = 24, repeat = true,
-                    dest_x = 75, dest_y = 255, dest_width = 345 / 4, dest_height = 259 / 4,
-                    ticksForAFrame = 1
-                ),
-                "running": new Animation(
-                    imageSrc = "./images/Sprites/run_9.png", src_width = 351, src_height = 261,
-                    row = 0, startFrame = 0, qtdFrames = 9, repeat = true,
-                    dest_x = 75, dest_y = 255, dest_width = 351 / 4, dest_height = 261 / 4,
-                    ticksForAFrame = 2.5
-                ),
-                "jumping_up": new Animation(
-                    imageSrc = "./images/Sprites/jump_24.png", src_width = 350, src_height = 317,
-                    row = 0, startFrame = 0, qtdFrames = 14, repeat = false,
-                    dest_x = 75, dest_y = 255, dest_width = 350 / 4, dest_height = 317 / 4,
-                    ticksForAFrame = 4
-                ),
-                "jumping_down": new Animation(
-                    imageSrc = "./images/Sprites/jump_24.png", src_width = 350, src_height = 317,
-                    row = 0, startFrame = 14, qtdFrames = 10, repeat = false,
-                    dest_x = 75, dest_y = 255, dest_width = 350 / 4, dest_height = 317 / 4,
-                    ticksForAFrame = 4
-                ),
-                "flying": new Animation(
-                    imageSrc = "./images/Sprites/fly_14.png", src_width = 384, src_height = 354,
-                    row = 0, startFrame = 0, qtdFrames = 14, repeat = true,
-                    dest_x = 75, dest_y = 255, dest_width = 384 / 4, dest_height = 354 / 4,
-                    ticksForAFrame = 3
-                ),
-                "dying": new Animation(
-                    imageSrc = "./images/Sprites/die_14.png", src_width = 357, src_height = 259,
-                    row = 0, startFrame = 0, qtdFrames = 14, repeat = false,
-                    dest_x = 75, dest_y = 255, dest_width = 357 / 4, dest_height = 259 / 4,
-                    ticksForAFrame = 3
-                )
-            };
-            // Pontuacao
-            this.score = 0;
+          // Posi��o
+          this.pX = 75;
+          this.pY_default = 255;
+          this.pY_max = 255; // Limite inferior
+          this.pY = this.pY_default;
+          // Vetores
+          this.vY = 0;
+          this.aY = 0;
+          this.jumpAceleration = -8;
+          this.state = 'idle'; // 'walking', 'running', 'jumping_up', 'jumping_down', 'flying', 'dying'
+          this.radius = 31;
+          // Anima��o
+          this.anim = {
+              "idle": new Animation(
+                  imageSrc = "./images/Sprites/Idle_24.png", src_width = 343, src_height = 248,
+                  row = 0, startFrame = 0, qtdFrames = 24, repeat = true,
+                  dest_x = 75, dest_y = 255, dest_width = 343 / 4, dest_height = 248 / 4,
+                  ticksForAFrame = 3
+              ),
+              "walking": new Animation(
+                  imageSrc = "./images/Sprites/walk_24.png", src_width = 345, src_height = 259,
+                  row = 0, startFrame = 0, qtdFrames = 24, repeat = true,
+                  dest_x = 75, dest_y = 255, dest_width = 345 / 4, dest_height = 259 / 4,
+                  ticksForAFrame = 1
+              ),
+              "running": new Animation(
+                  imageSrc = "./images/Sprites/run_9.png", src_width = 351, src_height = 261,
+                  row = 0, startFrame = 0, qtdFrames = 9, repeat = true,
+                  dest_x = 75, dest_y = 255, dest_width = 351 / 4, dest_height = 261 / 4,
+                  ticksForAFrame = 2.5
+              ),
+              "jumping_up": new Animation(
+                  imageSrc = "./images/Sprites/jump_24.png", src_width = 350, src_height = 317,
+                  row = 0, startFrame = 0, qtdFrames = 14, repeat = false,
+                  dest_x = 75, dest_y = 255, dest_width = 350 / 4, dest_height = 317 / 4,
+                  ticksForAFrame = 4
+              ),
+              "jumping_down": new Animation(
+                  imageSrc = "./images/Sprites/jump_24.png", src_width = 350, src_height = 317,
+                  row = 0, startFrame = 14, qtdFrames = 10, repeat = false,
+                  dest_x = 75, dest_y = 255, dest_width = 350 / 4, dest_height = 317 / 4,
+                  ticksForAFrame = 4
+              ),
+              "flying": new Animation(
+                  imageSrc = "./images/Sprites/fly_14.png", src_width = 384, src_height = 354,
+                  row = 0, startFrame = 0, qtdFrames = 14, repeat = true,
+                  dest_x = 75, dest_y = 255, dest_width = 384 / 4, dest_height = 354 / 4,
+                  ticksForAFrame = 3
+              ),
+              "dying": new Animation(
+                  imageSrc = "./images/Sprites/die_14.png", src_width = 357, src_height = 259,
+                  row = 0, startFrame = 0, qtdFrames = 14, repeat = false,
+                  dest_x = 75, dest_y = 255, dest_width = 357 / 4, dest_height = 259 / 4,
+                  ticksForAFrame = 3
+              )
+          };
+          // Pontuacao
+          this.score = 0;
         }
         update() {
             switch (game.state) {
@@ -509,23 +509,20 @@
             if (this.obstacles.length + this.waitingObstacles.length < 4) {
                 this.waitingObstacles.push(this.tick + Math.floor(Math.random() * 2000) + 300);
             }
-            //var level=this;
-
-            //console.log(this.waitingObstacles.length);
-            for (let i = this.waitingObstacles.length-1; i >= 0; i--) {
-                if (this.waitingObstacles[i] <= this.tick) {
-                    this.obstacles.push(new Obstaculo());
-                    this.waitingObstacles.splice(i, 1);
-                }
+            
+            for (var i = this.waitingObstacles.length-1; i >= 0; i--) {
+              if (this.waitingObstacles[i] <= this.tick) {
+                  this.obstacles.push(new Obstaculo());
+                  this.waitingObstacles.splice(i, 1);
+              }
             }
-            for (let i = this.waitingObstacles.length-1; i >= 0; i--) {
-                if (this.waitingObstacles[i].state == 'out_of_scene') {
-                    this.waitingObstacles.splice(i, 1);
-                } else {
-                    console.log(this.waitingObstacles[i]);
-                    if (meta) this.waitingObstacles[i].update();
-                    if (draw) this.waitingObstacles[i].draw();
-                }
+            for (var i = this.obstacles.length-1; i >= 0; i--) {
+              if (this.obstacles[i].state == 'out_of_scene') {
+                  this.obstacles.splice(i, 1);
+              } else {
+                  if (meta) this.obstacles[i].update();
+                  if (draw) this.obstacles[i].draw();
+              }
             };
         }
         //PLAYER
@@ -608,8 +605,8 @@
                 )
             };
         }
-        update(speed){
-            this.pX += game.level.speed; //multiplicado pelo speedModifier do chao
+        update(){
+            this.pX += game.level.layers[game.level.layers.length-1].vX; //multiplicado pelo speedModifier do chao
             if (this.pX <= -this.anim[this.state].dest_width*2) {
                 this.state = 'out_of_scene';
             }
@@ -715,18 +712,16 @@
                     this.tick++;
                     
                     if (this.level.progressBar.currProgressPerc == 1) {
-                        this.state = 'level_end';
-                        this.level.player.state = 'idle';
+                        if (this.level.name == this.levels.lv1.name) {
+                            this.state = 'game_finish';
+                            //this.level = this.levels.lv2;
+                        } else if (this.level.name == this.levels.lv2.name) {
+                            this.levels.lv3;
+                        } else if (this.level.name == this.levels.lv3.name) {
+                            this.state = 'game_finish';
+                        }
                     };
 
-                    if (this.level.name == this.levels[0].name) {
-                        this.game.state = 'game_finish';
-                        //this.level = this.levels[1];
-                    } else if (this.level.name == this.levels[1].name) {
-                        this.levels[2];
-                    } else if (this.level.name == this.levels[2].name) {
-                        this.game.state = 'game_finish';
-                    }
                     
                     break;
                 case 'level_end':
@@ -744,6 +739,8 @@
     
                     this.level.tick++;
                     this.tick++;
+
+                    videoEnding();
                     
                     break;
                 case 'game_finish':
@@ -804,6 +801,10 @@
     function gameloop() {
         game.next_tick();
         requestAnimationFrame(gameloop);
+        function videoEnding() {
+          const vidEnding = document.getElementById("v_ending");
+          vidEnding.hidden = false;
+        }
     }
     gameloop();
 //}
